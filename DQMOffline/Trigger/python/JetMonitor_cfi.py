@@ -23,11 +23,14 @@ hltJetMETmonitoring = jetMonitoring.clone(
     ptcut = 20.,
     ispfjettrg = True, # is PFJet Trigger ?
     iscalojettrg = False, # is CaloJet Trigger ?
+    isscoutingpfjettrg = False, # is ScoutingPFJet Trigger ?
+    isscoutingpfjet = False,
+
 
     numGenericTriggerEventPSet = dict(
         andOr         =  False,
         dbLabel       = "JetMETDQMTrigger", # it does not exist yet, we should consider the possibility of using the DB, but as it is now it will need a label per path !
-        andOrHlt      = True, # True:=OR; False:=AND
+        andOrHlt      = True, # True:=OR; False:=AND (default)
         hltInputTag   =  "TriggerResults::HLT",
         hltPaths      = ["HLT_PFJet450_v*"], # HLT_ZeroBias_v*
         errorReplyHlt = False,
@@ -35,6 +38,8 @@ hltJetMETmonitoring = jetMonitoring.clone(
 
     denGenericTriggerEventPSet = dict(
         andOr         =  False,
+        #andOrHlt      = False, # True:=OR; False:=AND (default)
+        hltPaths      = ["HLT_IsoMu27_v*"], #use orthogonal method for jet trigger efficiency
         dcsInputTag   =  "scalersRawToDigi",
         dcsRecordInputTag = "onlineMetaDataDigis",
         dcsPartitions = [ 24, 25, 26, 27, 28, 29], # 24-27: strip, 28-29: pixel, we should add all other detectors !

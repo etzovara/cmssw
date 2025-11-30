@@ -216,7 +216,8 @@ PFJetFwd500_Prommonitoring = hltJetMETmonitoring.clone(
                 nbins = 125,
                 xmin  =   0.,
                 xmax  = 1250)),
-    numGenericTriggerEventPSet = dict(hltPaths = ["HLT_PFJetFwd500_v*"])
+    numGenericTriggerEventPSet = dict(hltPaths = ["HLT_PFJetFwd500_v*"])#,
+    #denGenericTriggerEventPSet = dict(hltPaths = ["HLT_IsoMu27_v*"])
 )
 
 
@@ -516,6 +517,175 @@ CaloJet500_NoJetID_Prommonitoring = hltJetMETmonitoring.clone(
 )
 
 
+### Scouitng Trigger and L1 seeds ###
+# HLT_PFJet200
+PFScoutingJetHT_Prommonitoring = hltJetMETmonitoring.clone(
+    FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/DST_PFScouting_JetHT/',
+    jetSrc = "hltScoutingPFPacker",
+    ispfjettrg = False,
+    isscoutingpfjettrg = True,
+    isscoutingpfjet = True,
+    histoPSet = dict(jetPtThrPSet = dict(
+                nbins =  120 ,
+                xmin  =   0.,
+                xmax  =  1200.)),
+    numGenericTriggerEventPSet = dict(hltPaths = ["DST_PFScouting_JetHT_v*"]),
+    denGenericTriggerEventPSet = dict(
+        andOrHlt = False, # True:=OR; False:=AND (default)
+        #hltPaths = ["HLT_TriggersForScoutingPFMonitor_PS1000_v*","DST_PFScouting_SingleMuon_v*"])
+        hltPaths = ["HLT_TriggersForScoutingPFMonitor_PS1000_v*","DST_PFScouting_ZeroBias_v*"])
+        #hltPaths = ["DST_PFScouting_SingleMuon_v*"])
+        #hltPaths = ["HLT_TriggersForScoutingPFMonitor_PS250_v*"])
+) ### +++     denGenericTriggerEventPSet = dict(hltPaths = [""HLT_IsoMu27_v*"])
+### +++ jetPSet -> for binning of pT plots |||| jetPtThrPSet  -> for binning of pTthresh plots
+
+#
+L1HTT200_Prommonitoring = hltJetMETmonitoring.clone(
+    FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_HTT200er/',
+    jetSrc = "hltScoutingPFPacker",
+    ispfjettrg = False,
+    isscoutingpfjettrg = True,
+    isscoutingpfjet = True,
+    histoPSet = dict(jetPtThrPSet = dict(
+                nbins =  50 ,
+                xmin  =   0.,
+                xmax  =  500.)),
+    numGenericTriggerEventPSet = dict(hltPaths = ["L1_HTT250er_v*"])
+) ### +++     denGenericTriggerEventPSet = dict(hltPaths = [""HLT_IsoMu27_v*"])
+
+
+#
+L1HTT255_Prommonitoring = hltJetMETmonitoring.clone(
+    FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_HTT255er/',
+    jetSrc = "hltScoutingPFPacker",
+    ispfjettrg = False,
+    isscoutingpfjettrg = True,
+    isscoutingpfjet = True,
+    histoPSet = dict(jetPtThrPSet = dict(
+                nbins =  60 ,
+                xmin  =   0.,
+                xmax  =  600.)),
+    numGenericTriggerEventPSet = dict(hltPaths = ["L1_HTT255er_v*"])
+)
+
+
+# HLT_PFJet260
+L1HTT280_Prommonitoring = hltJetMETmonitoring.clone(
+    FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_HTT280er/',
+    jetSrc = "hltScoutingPFPacker",
+    ispfjettrg = False,
+    isscoutingpfjettrg = True,
+    isscoutingpfjet = True,
+    histoPSet = dict(jetPtThrPSet = dict(
+                nbins = 65,
+                xmin  = 0.,
+                xmax  =  650.)),
+    numGenericTriggerEventPSet = dict(hltPaths = ["L1_HTT280er_v*"])
+)
+
+
+# HLT_PFJet320
+L1HTT320_Prommonitoring = hltJetMETmonitoring.clone(
+    FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_HTT320er/',
+    jetSrc = "hltScoutingPFPacker",
+    ispfjettrg = False,
+    isscoutingpfjettrg = True,
+    isscoutingpfjet = True,
+    histoPSet = dict(jetPtThrPSet = dict(
+                nbins = 80 ,
+                xmin  =  0.,
+                xmax  = 800.)),
+    numGenericTriggerEventPSet = dict(hltPaths = ["L1_HTT320er_v*"])
+)
+
+
+# HLT_PFJet400
+L1HTT360_Prommonitoring = hltJetMETmonitoring.clone(
+    FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_HTT360er/',
+    jetSrc = "hltScoutingPFPacker",
+    ispfjettrg = False,
+    isscoutingpfjettrg = True,
+    isscoutingpfjet = True,
+    histoPSet = dict(jetPtThrPSet = dict(
+                nbins = 100 ,
+                xmin  =  0.,
+                xmax  =  1000.)),
+    numGenericTriggerEventPSet = dict(hltPaths = ["L1_HTT360er_v*"])
+)
+
+# HLT_PFJet500
+L1HTT400_Prommonitoring = hltJetMETmonitoring.clone(
+    FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_HTT400er/',
+    jetSrc = "hltScoutingPFPacker",
+    ispfjettrg = False,
+    isscoutingpfjettrg = True,
+    isscoutingpfjet = True,
+    histoPSet = dict(jetPtThrPSet = dict(
+                nbins =  125,
+                xmin  =  0.,
+                xmax  = 1250)),
+    numGenericTriggerEventPSet = dict(hltPaths = ["L1_HTT400er_v*"])
+)
+
+
+# HLT_PFJet500
+L1HTT450_Prommonitoring = hltJetMETmonitoring.clone(
+    FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_HTT450er/',
+    jetSrc = "hltScoutingPFPacker",
+    ispfjettrg = False,
+    isscoutingpfjettrg = True,
+    isscoutingpfjet = True,
+    histoPSet = dict(jetPtThrPSet = dict(
+                nbins =  125,
+                xmin  =  0.,
+                xmax  = 1250)),
+    numGenericTriggerEventPSet = dict(hltPaths = ["L1_HTT450er_v*"])
+)
+
+
+#
+L1SingleJet180_Prommonitoring = hltJetMETmonitoring.clone(
+    FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_SingleJet180/',
+    jetSrc = "hltScoutingPFPacker",
+    ispfjettrg = False,
+    isscoutingpfjettrg = True,
+    isscoutingpfjet = True,
+    histoPSet = dict(jetPtThrPSet = dict(
+                nbins =  50 ,
+                xmin  =   0.,
+                xmax  =  500.)),
+    numGenericTriggerEventPSet = dict(hltPaths = ["L1_SingleJet180_v*"])
+)
+
+
+#
+L1SingleJet200_Prommonitoring = hltJetMETmonitoring.clone(
+    FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_SingleJet200/',
+    jetSrc = "hltScoutingPFPacker",
+    ispfjettrg = False,
+    isscoutingpfjettrg = True,
+    isscoutingpfjet = True,
+    histoPSet = dict(jetPtThrPSet = dict(
+                nbins =  50 ,
+                xmin  =   0.,
+                xmax  =  500.)),
+    numGenericTriggerEventPSet = dict(hltPaths = ["L1_SingleJet200_v*"])
+)
+
+
+#
+#    *L1HTT450_Prommonitoring
+#    *L1HTT200_Prommonitoring
+#    *L1HTT255_Prommonitoring
+#    *L1HTT280_Prommonitoring
+#    *L1HTT320_Prommonitoring
+#    *L1HTT360_Prommonitoring
+#    *L1HTT400_Prommonitoring
+#    *L1HTT450_Prommonitoring
+#    *L1SingleJet180_Prommonitoring
+#    *L1SingleJet200_Prommonitoring
+#    *PFScoutingJetHT_Prommonitoring
+
 HLTJetmonitoring = cms.Sequence(
     PFJet40_Prommonitoring    
     *PFJet60_Prommonitoring    
@@ -558,4 +728,5 @@ HLTJetmonitoring = cms.Sequence(
     *AK8PFJetFwd400_Prommonitoring    
     *AK8PFJetFwd500_Prommonitoring 
     *CaloJet500_NoJetID_Prommonitoring
+    *PFScoutingJetHT_Prommonitoring
 )
