@@ -15,6 +15,7 @@
 #include "DataFormats/JetReco/interface/CaloJet.h"
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
+#include "DataFormats/Scouting/interface/Run3ScoutingPFJet.h"
 
 class JetMonitor : public DQMEDAnalyzer, public TriggerDQMBase {
 public:
@@ -29,6 +30,7 @@ public:
 protected:
   void bookHistograms(DQMStore::IBooker&, edm::Run const&, edm::EventSetup const&) override;
   void analyze(edm::Event const& iEvent, edm::EventSetup const& iSetup) override;
+  /////void scoutingToRecoPFJet(Run3ScoutingPFJet const& scoutingPFJet) override;
 
   bool isBarrel(double eta);
   bool isEndCapP(double eta);
@@ -66,10 +68,17 @@ private:
   double ptcut_;
   bool isPFJetTrig;
   bool isCaloJetTrig;
+  bool isScoutingPFJetTrig;
+  bool isScoutingPFJet;
 
   const bool enableFullMonitoring_;
 
-  edm::EDGetTokenT<edm::View<reco::Jet> > jetSrc_;
+  //if (isScoutingPFJetTrig) {
+    edm::EDGetTokenT<edm::View<Run3ScoutingPFJet> > scoutjetSrc_;
+  //} else {
+    edm::EDGetTokenT<edm::View<reco::Jet> > jetSrc_;
+  //}
+  ////edm::EDGetTokenT<std::vector<Run3ScoutingPFJet>> scoutingPfJetsToken_;
 
   std::unique_ptr<GenericTriggerEventFlag> num_genTriggerEventFlag_;
   std::unique_ptr<GenericTriggerEventFlag> den_genTriggerEventFlag_;
@@ -101,8 +110,16 @@ JetMonitor::JetMonitor(const edm::ParameterSet& iConfig)
       ptcut_(iConfig.getParameter<double>("ptcut")),
       isPFJetTrig(iConfig.getParameter<bool>("ispfjettrg")),
       isCaloJetTrig(iConfig.getParameter<bool>("iscalojettrg")),
+      isScoutingPFJetTrig(iConfig.getParameter<bool>("isscoutingpfjettrg")),
+      isScoutingPFJet(iConfig.getParameter<bool>("isscoutingpfjet")),
       enableFullMonitoring_(iConfig.getParameter<bool>("enableFullMonitoring")),
-      jetSrc_(mayConsume<edm::View<reco::Jet> >(iConfig.getParameter<edm::InputTag>("jetSrc"))),
+      //if (isScoutingPFJetTrig) {
+        //edm::EDGetTokenT<edm::View<Run3ScoutingPFJet> > jetSrc_;
+        scoutjetSrc_(mayConsume<edm::View<Run3ScoutingPFJet> >(iConfig.getParameter<edm::InputTag>("jetSrc"))),
+        //scoutingPfJetsToken_ = consumes<std::vector<Run3ScoutingPFJet>>(iConfig.getParameter<edm::InputTag>("jetSrc")),
+      //} else {
+        jetSrc_(mayConsume<edm::View<reco::Jet> >(iConfig.getParameter<edm::InputTag>("jetSrc"))),
+      //}
       num_genTriggerEventFlag_(new GenericTriggerEventFlag(
           iConfig.getParameter<edm::ParameterSet>("numGenericTriggerEventPSet"), consumesCollector(), *this)),
       den_genTriggerEventFlag_(new GenericTriggerEventFlag(
@@ -122,6 +139,31 @@ JetMonitor::~JetMonitor() throw() {
     den_genTriggerEventFlag_.reset();
   }
 }
+
+/*void JetMonitor::scoutingToRecoPFJet(Run3ScoutingPFJet const& scoutingPFJets) {
+  edm::Handle<vector<Run3ScoutingPFJet>> scoutingPFJets;
+  if (isScoutingPFJetTrig) {
+    iEvent.getByToken(scoutingPfJetsToken_, scoutingPFJets);
+    if (!scoutingJets.isValid()) {
+      edm::LogWarning("JetMonitor") << "Scouting jet handle not valid \n";
+      return;
+    }
+    reco::PFJet reco_scoutingpfjet;
+    //if (isScoutingJet_) {
+    for (unsigned int ijet = 0; ijet < scoutingpfjet->size(); ijet++) {
+      reco::Particle::PolarLorentzVector reco_scoutingpfjetP4(scoutingPFJets.pt(),
+                                                               scoutingPFJets.eta(),
+                                                               scoutingPFJets.phi(),
+                                                               scoutingPFJets.m());
+      reco_scoutingpfjet.setP4(reco_scoutingpfjetP4);
+      reco_scoutingpfjet.setJetArea(scoutingPFJets.jetArea());
+    }
+    //}
+    offjets = reco_scoutingpfjet;
+    //or
+    return reco_scoutingpfjet;
+}*/
+
 
 void JetMonitor::bookHistograms(DQMStore::IBooker& ibooker, edm::Run const& iRun, edm::EventSetup const& iSetup) {
   // Initialize the GenericTriggerEventFlag
@@ -149,12 +191,15 @@ void JetMonitor::bookHistograms(DQMStore::IBooker& ibooker, edm::Run const& iRun
   std::string currentFolder = folderName_;
   ibooker.setCurrentFolder(currentFolder);
 
-  if (isPFJetTrig) {
+  if (isPFJetTrig) { // || isScoutingPFJetTrig
     hist_obtag = "pfjet";
     histtitle_obtag = "PFJet";
   } else if (isCaloJetTrig) {
     hist_obtag = "calojet";
     histtitle_obtag = "CaloJet";
+  } else if (isScoutingPFJetTrig) {
+    hist_obtag = "scoutingpfjet";
+    histtitle_obtag = "ScoutingPfJet";
   } else {
     hist_obtag = "pfjet";
     histtitle_obtag = "PFJet";
@@ -241,7 +286,70 @@ void JetMonitor::analyze(edm::Event const& iEvent, edm::EventSetup const& iSetup
   v_jeteta.clear();
   v_jetphi.clear();
 
-  edm::Handle<edm::View<reco::Jet> > offjets;
+
+  if (isScoutingPFJet) {
+    edm::Handle<edm::View<Run3ScoutingPFJet>> scoutjets;
+    iEvent.getByToken(scoutjetSrc_, scoutjets);
+    if (!scoutjets.isValid()) {
+      edm::LogWarning("JetMonitor") << "Scouting jet handle not valid \n";
+      return;
+    }
+    for (edm::View<Run3ScoutingPFJet>::const_iterator ibegin = scoutjets->begin(), iend = scoutjets->end(), ijet = ibegin;
+        ijet != iend;
+        ++ijet) {
+      if (ijet->pt() < ptcut_) {
+        continue;
+      }
+      v_jetpt.push_back(ijet->pt());
+      v_jeteta.push_back(ijet->eta());
+      v_jetphi.push_back(ijet->phi());
+      //    cout << "jetpt (view ) : " << ijet->pt() << endl;
+    }
+  } else {
+    edm::Handle<edm::View<reco::Jet> > offjets;
+    iEvent.getByToken(jetSrc_, offjets);
+    if (!offjets.isValid()) {
+      edm::LogWarning("JetMonitor") << "Jet handle not valid \n";
+      return;
+    }
+    for (edm::View<reco::Jet>::const_iterator ibegin = offjets->begin(), iend = offjets->end(), ijet = ibegin;
+        ijet != iend;
+        ++ijet) {
+      if (ijet->pt() < ptcut_) {
+        continue;
+      }
+      v_jetpt.push_back(ijet->pt());
+      v_jeteta.push_back(ijet->eta());
+      v_jetphi.push_back(ijet->phi());
+      //    cout << "jetpt (view ) : " << ijet->pt() << endl;
+    }
+  }
+
+/////////////////////
+/*  edm::Handle<edm::View<vector<Run3ScoutingPFJet>>> scoutingJets;
+  //or
+  //edm::Handle<vector<Run3ScoutingPFJet>> scoutingJets;
+  if (isScoutingPFJet) {
+    iEvent.getByToken(scoutingPfJetsToken_, scoutingJets);
+    if (!scoutingJets.isValid()) {
+      edm::LogWarning("JetMonitor") << "Scouting jet handle not valid \n";
+      return;
+    }
+    reco::PFJet reco_scoutingpfjet;
+    //if (isScoutingJet_) {
+      reco::Particle::PolarLorentzVector reco_scoutingpfjetP4(scoutingJets.pt(),
+                                                               scoutingJets.eta(),
+                                                               scoutingJets.phi(),
+                                                               scoutingJets.m());
+      reco_scoutingpfjet.setP4(dummy_scoutingpfjetP4);
+      reco_scoutingpfjet.setJetArea(scoutingJets.jetArea());
+    //}
+    offjets = reco_scoutingpfjet;
+  }*/
+  /////////////////////////////
+
+  //////////////////// original below:
+  /*edm::Handle<edm::View<reco::Jet> > offjets;
   iEvent.getByToken(jetSrc_, offjets);
   if (!offjets.isValid()) {
     edm::LogWarning("JetMonitor") << "Jet handle not valid \n";
@@ -257,7 +365,8 @@ void JetMonitor::analyze(edm::Event const& iEvent, edm::EventSetup const& iSetup
     v_jeteta.push_back(ijet->eta());
     v_jetphi.push_back(ijet->phi());
     //    cout << "jetpt (view ) : " << ijet->pt() << endl;
-  }
+  }*/
+
 
   if (v_jetpt.empty())
     return;
@@ -471,6 +580,8 @@ void JetMonitor::fillDescriptions(edm::ConfigurationDescriptions& descriptions) 
   desc.add<double>("ptcut", 20);
   desc.add<bool>("ispfjettrg", true);
   desc.add<bool>("iscalojettrg", false);
+  desc.add<bool>("isscoutingpfjettrg", false);
+  desc.add<bool>("isscoutingpfjet", false);
 
   desc.add<bool>("enableFullMonitoring", true);
 
