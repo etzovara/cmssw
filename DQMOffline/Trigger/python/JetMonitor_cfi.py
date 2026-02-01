@@ -20,11 +20,13 @@ hltJetMETmonitoring = jetMonitoring.clone(
                 xmax  = 900),
     ),
     jetSrc = 'ak4PFJets', # ak4PFJets, ak4PFJetsCHS
-    ptcut = 20.,
+    ptcut = 30.,
     ispfjettrg = True, # is PFJet Trigger ?
     iscalojettrg = False, # is CaloJet Trigger ?
     isscoutingpfjettrg = False, # is ScoutingPFJet Trigger ?
     isscoutingpfjet = False,
+    JetIDQuality = 'TIGHT',
+    JetIDVersion = 'RUN3Scouting',  #maybe put a pfpuppi version, but need to define it in the relevant if above
 
 
     numGenericTriggerEventPSet = dict(

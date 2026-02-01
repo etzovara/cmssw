@@ -578,7 +578,6 @@ PFScoutingJetHT_Prommonitoring = hltJetMETmonitoring.clone(
 ) ### +++     denGenericTriggerEventPSet = dict(hltPaths = [""HLT_IsoMu27_v*"])
 ### +++ jetPSet -> for binning of pT plots |||| jetPtThrPSet  -> for binning of pTthresh plots
 
-#----->for l1seeds declaration see here: https://github.com/patinkaew/Run3ScoutingJetMETAnalysis/blob/main/Analysis/python/TriggerEfficiency_cfg.py#L146 + TriggerEfficiencyAnalyzer.cc l.165
 L1HTT200_Prommonitoring = hltJetMETmonitoring.clone(
     FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_HTT200er/',
     jetSrc = "hltScoutingPFPacker",
