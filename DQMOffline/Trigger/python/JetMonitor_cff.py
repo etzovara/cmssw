@@ -1,6 +1,38 @@
 import FWCore.ParameterSet.Config as cms
 
 from DQMOffline.Trigger.JetMonitor_cfi import hltJetMETmonitoring
+from JetMETCorrections.Configuration.JetCorrectors_cff import *
+
+###################     Scouting JECs    #################
+ak4PFScoutL1FastjetCorrector = ak4PFL1FastjetCorrector.clone(
+    algorithm   = cms.string('AK4PFHLT'),
+    srcRho = cms.InputTag("hltScoutingPFPacker","rho")
+    )
+    
+ak4PFScoutL2RelativeCorrector = ak4PFL2RelativeCorrector.clone( 
+    algorithm = cms.string('AK4PFHLT'),
+    )
+
+ak4PFScoutL3AbsoluteCorrector = ak4PFL3AbsoluteCorrector.clone( 
+    algorithm = cms.string('AK4PFHLT'),
+    )
+
+ak4PFScoutResidualCorrector  = ak4PFResidualCorrector.clone( 
+    algorithm = cms.string('AK4PFHLT'),
+    )
+
+ak4PFScoutL1FastL2L3ResidualCorrector = cms.EDProducer(
+    'ChainedJetCorrectorProducer',
+    correctors = cms.VInputTag('ak4PFScoutL1FastjetCorrector','ak4PFScoutL2RelativeCorrector','ak4PFScoutL3AbsoluteCorrector','ak4PFScoutResidualCorrector')
+    )
+    
+ak4PFScoutL1FastL2L3ResidualCorrectorTask = cms.Task(
+    ak4PFScoutL1FastjetCorrector, ak4PFScoutL2RelativeCorrector, ak4PFScoutL3AbsoluteCorrector, ak4PFScoutResidualCorrector, ak4PFScoutL1FastL2L3ResidualCorrector
+)
+ak4PFScoutL1FastL2L3ResidualCorrectorChain = cms.Sequence(ak4PFScoutL1FastL2L3ResidualCorrectorTask)
+  
+
+
 
 ### HLT_PFJet Triggers ###
 # HLT_PFJet450
@@ -522,9 +554,15 @@ CaloJet500_NoJetID_Prommonitoring = hltJetMETmonitoring.clone(
 PFScoutingJetHT_Prommonitoring = hltJetMETmonitoring.clone(
     FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/DST_PFScouting_JetHT/',
     jetSrc = "hltScoutingPFPacker",
+    #muons = "hltScoutingMuonPackerNoVtx",
+    muons = "hltScoutingMuonPackerVtx",
+    vertices = "hltScoutingPrimaryVertexPacker",
+    corrector = "ak4PFScoutL1FastL2L3ResidualCorrector",
     ispfjettrg = False,
     isscoutingpfjettrg = True,
     isscoutingpfjet = True,
+    JetIDQuality = "TIGHT",
+    JetIDVersion = "RUN3Scouting",
     histoPSet = dict(jetPtThrPSet = dict(
                 nbins =  120 ,
                 xmin  =   0.,
@@ -532,17 +570,22 @@ PFScoutingJetHT_Prommonitoring = hltJetMETmonitoring.clone(
     numGenericTriggerEventPSet = dict(hltPaths = ["DST_PFScouting_JetHT_v*"]),
     denGenericTriggerEventPSet = dict(
         andOrHlt = False, # True:=OR; False:=AND (default)
-        #hltPaths = ["HLT_TriggersForScoutingPFMonitor_PS1000_v*","DST_PFScouting_SingleMuon_v*"])
-        hltPaths = ["HLT_TriggersForScoutingPFMonitor_PS1000_v*","DST_PFScouting_ZeroBias_v*"])
+        hltPaths = ["HLT_TriggersForScoutingPFMonitor_PS1000_v*","DST_PFScouting_SingleMuon_v*"])
+        #hltPaths = ["HLT_TriggersForScoutingPFMonitor_PS1000_v*","DST_PFScouting_ZeroBias_v*"])
+        #hltPaths = ["DST_PFScouting_ZeroBias_v*"])
         #hltPaths = ["DST_PFScouting_SingleMuon_v*"])
         #hltPaths = ["HLT_TriggersForScoutingPFMonitor_PS250_v*"])
 ) ### +++     denGenericTriggerEventPSet = dict(hltPaths = [""HLT_IsoMu27_v*"])
 ### +++ jetPSet -> for binning of pT plots |||| jetPtThrPSet  -> for binning of pTthresh plots
 
-#
+#----->for l1seeds declaration see here: https://github.com/patinkaew/Run3ScoutingJetMETAnalysis/blob/main/Analysis/python/TriggerEfficiency_cfg.py#L146 + TriggerEfficiencyAnalyzer.cc l.165
 L1HTT200_Prommonitoring = hltJetMETmonitoring.clone(
     FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_HTT200er/',
     jetSrc = "hltScoutingPFPacker",
+    #muons = "hltScoutingMuonPackerVtx",
+    muons = "hltScoutingMuonPackerNoVtx",
+    vertices = "hltScoutingPrimaryVertexPacker",
+    corrector = "ak4PFScoutL1FastL2L3ResidualCorrector",
     ispfjettrg = False,
     isscoutingpfjettrg = True,
     isscoutingpfjet = True,
@@ -558,6 +601,9 @@ L1HTT200_Prommonitoring = hltJetMETmonitoring.clone(
 L1HTT255_Prommonitoring = hltJetMETmonitoring.clone(
     FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_HTT255er/',
     jetSrc = "hltScoutingPFPacker",
+    muons = "hltScoutingMuonPackerNoVtx",
+    vertices = "hltScoutingPrimaryVertexPacker",
+    corrector = "ak4PFScoutL1FastL2L3ResidualCorrector",
     ispfjettrg = False,
     isscoutingpfjettrg = True,
     isscoutingpfjet = True,
@@ -573,6 +619,9 @@ L1HTT255_Prommonitoring = hltJetMETmonitoring.clone(
 L1HTT280_Prommonitoring = hltJetMETmonitoring.clone(
     FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_HTT280er/',
     jetSrc = "hltScoutingPFPacker",
+    muons = "hltScoutingMuonPackerNoVtx",
+    vertices = "hltScoutingPrimaryVertexPacker",
+    corrector = "ak4PFScoutL1FastL2L3ResidualCorrector",
     ispfjettrg = False,
     isscoutingpfjettrg = True,
     isscoutingpfjet = True,
@@ -588,6 +637,9 @@ L1HTT280_Prommonitoring = hltJetMETmonitoring.clone(
 L1HTT320_Prommonitoring = hltJetMETmonitoring.clone(
     FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_HTT320er/',
     jetSrc = "hltScoutingPFPacker",
+    muons = "hltScoutingMuonPackerNoVtx",
+    vertices = "hltScoutingPrimaryVertexPacker",
+    corrector = "ak4PFScoutL1FastL2L3ResidualCorrector",
     ispfjettrg = False,
     isscoutingpfjettrg = True,
     isscoutingpfjet = True,
@@ -603,6 +655,9 @@ L1HTT320_Prommonitoring = hltJetMETmonitoring.clone(
 L1HTT360_Prommonitoring = hltJetMETmonitoring.clone(
     FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_HTT360er/',
     jetSrc = "hltScoutingPFPacker",
+    muons = "hltScoutingMuonPackerNoVtx",
+    vertices = "hltScoutingPrimaryVertexPacker",
+    corrector = "ak4PFScoutL1FastL2L3ResidualCorrector",
     ispfjettrg = False,
     isscoutingpfjettrg = True,
     isscoutingpfjet = True,
@@ -617,6 +672,9 @@ L1HTT360_Prommonitoring = hltJetMETmonitoring.clone(
 L1HTT400_Prommonitoring = hltJetMETmonitoring.clone(
     FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_HTT400er/',
     jetSrc = "hltScoutingPFPacker",
+    muons = "hltScoutingMuonPackerNoVtx",
+    vertices = "hltScoutingPrimaryVertexPacker",
+    corrector = "ak4PFScoutL1FastL2L3ResidualCorrector",
     ispfjettrg = False,
     isscoutingpfjettrg = True,
     isscoutingpfjet = True,
@@ -632,6 +690,9 @@ L1HTT400_Prommonitoring = hltJetMETmonitoring.clone(
 L1HTT450_Prommonitoring = hltJetMETmonitoring.clone(
     FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_HTT450er/',
     jetSrc = "hltScoutingPFPacker",
+    muons = "hltScoutingMuonPackerNoVtx",
+    vertices = "hltScoutingPrimaryVertexPacker",
+    corrector = "ak4PFScoutL1FastL2L3ResidualCorrector",
     ispfjettrg = False,
     isscoutingpfjettrg = True,
     isscoutingpfjet = True,
@@ -647,6 +708,9 @@ L1HTT450_Prommonitoring = hltJetMETmonitoring.clone(
 L1SingleJet180_Prommonitoring = hltJetMETmonitoring.clone(
     FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_SingleJet180/',
     jetSrc = "hltScoutingPFPacker",
+    muons = "hltScoutingMuonPackerNoVtx",
+    vertices = "hltScoutingPrimaryVertexPacker",
+    corrector = "ak4PFScoutL1FastL2L3ResidualCorrector",
     ispfjettrg = False,
     isscoutingpfjettrg = True,
     isscoutingpfjet = True,
@@ -662,6 +726,9 @@ L1SingleJet180_Prommonitoring = hltJetMETmonitoring.clone(
 L1SingleJet200_Prommonitoring = hltJetMETmonitoring.clone(
     FolderName = 'HLT/JME/Jets/AK4/ScoutingPF/L1_SingleJet200/',
     jetSrc = "hltScoutingPFPacker",
+    muons = "hltScoutingMuonPackerNoVtx",
+    vertices = "hltScoutingPrimaryVertexPacker",
+    corrector = "ak4PFScoutL1FastL2L3ResidualCorrector",
     ispfjettrg = False,
     isscoutingpfjettrg = True,
     isscoutingpfjet = True,
@@ -687,7 +754,8 @@ L1SingleJet200_Prommonitoring = hltJetMETmonitoring.clone(
 #    *PFScoutingJetHT_Prommonitoring
 
 HLTJetmonitoring = cms.Sequence(
-    PFJet40_Prommonitoring    
+    ak4PFPuppiL1FastL2L3CorrectorChain
+    *PFJet40_Prommonitoring    
     *PFJet60_Prommonitoring    
     *PFJet80_Prommonitoring    
     *PFJet140_Prommonitoring    
@@ -728,5 +796,6 @@ HLTJetmonitoring = cms.Sequence(
     *AK8PFJetFwd400_Prommonitoring    
     *AK8PFJetFwd500_Prommonitoring 
     *CaloJet500_NoJetID_Prommonitoring
+    *ak4PFScoutL1FastL2L3ResidualCorrectorChain
     *PFScoutingJetHT_Prommonitoring
 )
