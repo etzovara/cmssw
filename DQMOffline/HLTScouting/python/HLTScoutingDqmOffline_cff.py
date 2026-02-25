@@ -17,6 +17,7 @@ from HLTriggerOffline.Scouting.HLTScoutingEGammaDqmOffline_cff import *
 
 ### Jets Monitoring
 from DQMOffline.JetMET.jetMETDQMOfflineSource_cff import *
+from DQMOffline.Trigger.JetMETPromptMonitor_cff import *
 
 ### Miscellaneous monitoring
 from DQM.HLTEvF.ScoutingCollectionMonitor_cfi import *
@@ -38,7 +39,8 @@ hltScoutingMuonDqmOffline = cms.Sequence(scoutingMonitoringTagProbeMuonNoVtx *
 
 hltScoutingJetDqmOffline = cms.Sequence(jetMETDQMOfflineSourceScouting)
 ## remove corrector to not schedule the run of the corrector modules which crash if scouting objects are missing
-hltScoutingJetDqmOfflineForRelVals = cms.Sequence(jetMETDQMOfflineSourceScoutingNoCorrection)
+hltScoutingJetDqmOfflineForRelVals = cms.Sequence(jetMETDQMOfflineSourceScoutingNoCorrection +
+                                                  jetmetScoutingNoJECsMonitorHLT)
 
 hltScoutingCollectionMonitor = cms.Sequence(scoutingCollectionMonitor)
 hltScoutingDileptonMonitor = cms.Sequence(ScoutingDileptonMonitor)
@@ -49,6 +51,7 @@ hltScoutingDqmOffline = cms.Sequence(hltScoutingMuonDqmOffline +
                                      hltScoutingJetDqmOffline +
                                      hltScoutingDileptonMonitor +
                                      hltScoutingPi0Monitor +
+                                     jetmetScoutingMonitorHLT +
                                      hltScoutingCollectionMonitor)
 
 ## Add the scouting rechits monitoring (only for 2025, integrated in menu GRun 2025 V1.3)
