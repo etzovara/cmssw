@@ -19,6 +19,9 @@ from HLTriggerOffline.Scouting.HLTScoutingEGammaDqmOffline_cff import *
 from DQMOffline.JetMET.jetMETDQMOfflineSource_cff import *
 from DQMOffline.Trigger.JetMETPromptMonitor_cff import *
 
+### Electron best track producer
+from PhysicsTools.Scouting.Run3ScoutingElectronBestTrackProducer_cfi import Run3ScoutingElectronBestTrackProducer as run3ScoutingElectronBestTrack
+
 ### Miscellaneous monitoring
 from DQM.HLTEvF.ScoutingCollectionMonitor_cfi import *
 
@@ -50,6 +53,7 @@ hltScoutingPi0Monitor = cms.Sequence(ScoutingPi0Monitor)
 hltScoutingDqmOffline = cms.Sequence(hltScoutingMuonDqmOffline +
                                      hltScoutingEGammaDqmOffline +
                                      hltScoutingJetDqmOffline +
+                                     run3ScoutingElectronBestTrack +
                                      hltScoutingDileptonMonitor +
                                      hltScoutingPi0Monitor +
                                      jetmetScoutingMonitorHLT +
